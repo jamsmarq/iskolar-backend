@@ -1,0 +1,3 @@
+* The initialization of the server is on the Service file
+* The login/password call is put on the strategy file
+* Guards is just a check if the request has a valid AT
