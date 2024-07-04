@@ -1,21 +1,31 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { SupabaseService } from 'src/supabase/supabase.service';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService,
+    private supabaseService: SupabaseService,
+    // private jwtService: JwtService,
   ) { }
 
-  async login(username: string, pass: string): Promise<{ access_token: string }> {
-    const user = await this.usersService.findOne(username);
+  async validateUser(username: string, pass: string): Promise<any> {
+    const supabaseClient = this.supabaseService.getClient();
 
-    if (user?.password !== pass) { throw new UnauthorizedException('Invalid credentials') }
+    const {data: profiles, error} = await supabaseClient.from('profiles').select('username').eq('username', username)
 
-    const payload = {sub: user.userId, username: user.username};
+    // const {data, error} = await supabaseClient.auth.signInWithPassword({
+    //   email: username,
+    //   password: pass,
+    // })
 
-    return {access_token: await this.jwtService.signAsync(payload)};
+    if (error) { 
+      console.log(error)
+      throw new UnauthorizedException('Invalid credentials') 
+    }
+
+    return profiles
   }
 }
