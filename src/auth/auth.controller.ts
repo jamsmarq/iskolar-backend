@@ -8,10 +8,10 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
-  @UseGuards(LocalAuthGuard)
+  // @UseGuards(LocalAuthGuard)
   @Post('login')
-  signIn(@Body() signInDto: {username: string, password: string}) {
-    return this.authService.validateUser(signInDto.username, signInDto.password);
+  signIn(@Body() signInDto: {email: string, password: string}) {
+    return this.authService.validateUser(signInDto.email, signInDto.password);
   }
 
   @HttpCode(HttpStatus.OK)

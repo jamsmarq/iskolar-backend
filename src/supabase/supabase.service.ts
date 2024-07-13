@@ -8,7 +8,9 @@ export class SupabaseService {
   private supabaseAdmin: SupabaseClient
 
   constructor () {
-    this.supabaseClient = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+    this.supabaseClient = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, 
+      {auth: {autoRefreshToken: false, persistSession: false, detectSessionInUrl: false }}
+    )
     this.supabaseAdmin = createClient(process.env.SUPABASE_URL, process.env.SERVICE_ROLE_KEY)
   }
 
