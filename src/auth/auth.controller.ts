@@ -20,8 +20,11 @@ export class AuthController {
   signUp(@Body() signUpDto: {username: string, email: string, password: string}) {
     return this.authService.createUser(signUpDto.username, signUpDto.email, signUpDto.password);
   }
-  
-  // Add a verifyEmail endpoint
+
+  @Post('verify/email')
+  verifyEmail(@Body() verifyEmailDto: {email: string, token: string}) {    
+    return this.authService.verifyEmail(verifyEmailDto.email, verifyEmailDto.token);
+  }
 
   @UseGuards(AuthGuard)
   @Get('profile')

@@ -43,12 +43,12 @@ export class AuthService {
       throw new UnauthorizedException('Authentication failed')
     }
 
-    const payload = { access_token: auth.session.access_token, refresh_token: auth.session.refresh_token}
+    const payload = { access_token: auth.session.access_token, refresh_token: auth.session.refresh_token }
 
-    return payload 
+    return payload
   }
 
-  async createUser(username: string, email: string, pass: string): Promise<any> {
+  async createUser(username: string, email: string, pass: string): Promise<{ user_id: string, user_email: string }> {
     const supabaseClient = this.supabaseService.getClient();
     // const supabaseAdmin = this.supabaseService.getAdmin();
 
@@ -64,17 +64,39 @@ export class AuthService {
     }
 
     // Check if the email already exists
+    // If not, send verification to the email
     const { data: auth, error: authError } = await supabaseClient.auth.signUp({ email: email, password: pass })
 
     if (authError || !auth) {
       throw new UnauthorizedException(authError.message)
     }
 
-    // Send a verification email to the user
+    const payload = { user_id: auth.user.id, user_email: auth.user.email }
 
-    // Create the new account for the user
+    return payload
+  }
 
-    return true
+  async verifyEmail(email: string, token: string): Promise<{ access_token: string, refresh_token: string}> {
+    const supabaseClient = this.supabaseService.getClient();
+
+    // Verify if the OTP token is valid
+    const {data: auth, error: authError} = await supabaseClient.auth.verifyOtp({email: email, token: token, type: 'email'})
+
+    if (authError || !auth) {
+      throw new UnauthorizedException(authError.message)
+    }
+
+    const payload = { access_token: auth.session.access_token, refresh_token: auth.session.refresh_token }
+
+    return payload
+  }
+
+  async createUserProfile(user_id: string): Promise<any> { 
+    
+
+    // Create profile on the table
   }
 }
+
+
 
