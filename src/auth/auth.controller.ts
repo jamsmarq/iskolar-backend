@@ -21,9 +21,9 @@ export class AuthController {
     return this.authService.createUser(signUpDto.username, signUpDto.email, signUpDto.password);
   }
 
-  @Post('verify/email')
-  verifyEmail(@Body() verifyEmailDto: {email: string, token: string}) {    
-    return this.authService.verifyEmail(verifyEmailDto.email, verifyEmailDto.token);
+  @Post('signup/verify-email')
+  verifyEmail(@Body() verifyEmailDto: {username: string, email: string, token: string}) {    
+    return this.authService.verifyEmail(verifyEmailDto.email, verifyEmailDto.token, verifyEmailDto.username);
   }
 
   @UseGuards(AuthGuard)

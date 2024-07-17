@@ -55,7 +55,7 @@ export class AuthService {
     // Check if the username already exists
     const { data: profile, error: profileError } = await supabaseClient.from('profiles').select('user_id').eq('username', username).single()
 
-    if (profileError || !profile) {
+    if (profileError && profileError.code !== 'PGRST116') {
       throw new UnauthorizedException(profileError.message)
     }
 
@@ -67,6 +67,8 @@ export class AuthService {
     // If not, send verification to the email
     const { data: auth, error: authError } = await supabaseClient.auth.signUp({ email: email, password: pass })
 
+    console.log(authError.code)
+
     if (authError || !auth) {
       throw new UnauthorizedException(authError.message)
     }
@@ -76,7 +78,7 @@ export class AuthService {
     return payload
   }
 
-  async verifyEmail(email: string, token: string): Promise<{ access_token: string, refresh_token: string}> {
+  async verifyEmail(email: string, token: string, username: string): Promise<{ access_token: string, refresh_token: string}> {
     const supabaseClient = this.supabaseService.getClient();
 
     // Verify if the OTP token is valid
@@ -86,15 +88,16 @@ export class AuthService {
       throw new UnauthorizedException(authError.message)
     }
 
+    // Create the user profile on the table
+    const { error } = await supabaseClient.from('profiles').insert([{ username: username, user_id: auth.user.id }])
+
+    if (error) {
+      throw new UnauthorizedException(error.message)
+    }
+
     const payload = { access_token: auth.session.access_token, refresh_token: auth.session.refresh_token }
 
     return payload
-  }
-
-  async createUserProfile(user_id: string): Promise<any> { 
-    
-
-    // Create profile on the table
   }
 }
 
