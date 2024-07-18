@@ -67,8 +67,6 @@ export class AuthService {
     // If not, send verification to the email
     const { data: auth, error: authError } = await supabaseClient.auth.signUp({ email: email, password: pass })
 
-    console.log(authError.code)
-
     if (authError || !auth) {
       throw new UnauthorizedException(authError.message)
     }
